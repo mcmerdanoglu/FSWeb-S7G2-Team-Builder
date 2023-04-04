@@ -1,57 +1,68 @@
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
 import "./Form.css";
 
-function Form() {
-  const [user, setUser] = useState({
-    username: "",
-    password: "",
-    language: "",
-  });
+const emptyForm = { username: "", password: "", language: "" };
+
+function Form(props) {
+  const [formData, setFormData] = useState(emptyForm);
+  const [isEditing, setisEditing] = useState(false);
+
+  useEffect(() => {
+    console.log("Ak Gandalf oldum");
+    props.editMode ? setFormData(props.editMode) : setFormData(emptyForm);
+    props.editMode ? setisEditing(true) : setisEditing(false);
+  }, [props.editMode]);
 
   const handleChange = (event) => {
-    setUser({ ...user, [event.target.name]: event.target.value });
+    console.log(event.target.value);
+    const newFormData = {
+      ...formData,
+      [event.target.name]: event.target.value,
+    };
+    setFormData(newFormData);
   };
 
   const handleSubmit = (event) => {
     event.preventDefault();
-    console.log(user.name);
-    console.log(user.password);
-    console.log(user.language);
+    props.addMember(formData);
+    setisEditing(false);
+    setFormData(emptyForm);
   };
 
   return (
     <div className="form">
-      <h2>Giriş yapınız</h2>
-      {console.log(user)}
-      <form onSubmit={(event) => handleSubmit(event)} className="form-line">
-        <label>
+      {isEditing ? <h2>Üye Düzenle</h2> : <h2>Yeni Üye Ekle</h2>}
+      <form onSubmit={handleSubmit} className="form-line">
+        <label htmlFor="username">
           Username:
           <input
             type="text"
             name="username"
-            value={user.username}
+            value={formData.username}
             onChange={(event) => handleChange(event)}
           />
         </label>
-        <label>
+        <label htmlFor="password">
           Password:
           <input
             type="text"
             name="password"
-            value={user.password}
+            value={formData.password}
             onChange={(event) => handleChange(event)}
           />
         </label>
-        <label>
+        <label htmlFor="language">
           Language:
           <input
             type="text"
             name="language"
-            value={user.language}
+            value={formData.language}
             onChange={(event) => handleChange(event)}
           />
         </label>
-        <button className="submit">Add member</button>
+        <button className="submit" type="submit">
+          {isEditing ? "Edit Member" : "Add New Member"}
+        </button>
       </form>
     </div>
   );
